@@ -7,6 +7,7 @@ namespace NeighborSearch
         static void Main()
         {
             PointSet set = new PointSet();
+            set.FindNeighbors();
             //set.ConsolePrintPoints();
         }
     }

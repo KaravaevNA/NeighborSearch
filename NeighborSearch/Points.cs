@@ -31,13 +31,12 @@ namespace NeighborSearch
         private List<Point> Points { get; }
         private float Radius { get; set; }
 
-        public PointSet(float radius, string readFileName)
+        public PointSet(string readFileName)
         {
             Points = new List<Point>();
-            Radius = radius;
             ReadPoints(readFileName);
         }
-        public PointSet() : this(3.7f, "points.txt") { }
+        public PointSet() : this("points.txt") { }
 
         private void ReadPoints(string fileName)
         {
@@ -75,39 +74,50 @@ namespace NeighborSearch
             }
         }
 
-        public void FindNeighbors()
+        public void FindNeighbors(float radius = 3.7f)
         {
-            Console.Write("Глупый поиск соседей (1), последовательный поиск по ячейкам (2) или параллельный поиск по ячейкам (3)?");
+            Radius = radius;
+            Console.WriteLine("Глупый поиск соседей (1), последовательный поиск по ячейкам (2) или параллельный поиск по ячейкам (3)?");
             string? userInput = Console.ReadLine();
             var sw = new Stopwatch();
+
             switch (userInput)
             {
                 case "1":
                     sw.Start();
-                    NeighborFinder.SequentialSearch(Points);
+                    NeighborFinder.SequentialSearch(Points, Radius);
                     sw.Stop();
                     break;
                 case "2":
                     sw.Start();
-                    NeighborFinder.SequentialCell(Points);
+                    NeighborFinder.SequentialCell(Points, Radius);
                     sw.Stop();
                     break;
                 case "3":
                     sw.Start();
-                    NeighborFinder.ParallelCell(Points);
+                    NeighborFinder.ParallelCell(Points, Radius);
                     sw.Stop();
                     break;
                 default:
                     Console.WriteLine("Ошибка ввода при выборе алгоритма");
                     return;
             }
+
             Console.WriteLine($"Затрачено времени: {sw.ElapsedMilliseconds}");
+            WriteNeighbors("result.txt");
         }
 
         //public void ConsolePrintPoints()
         //{
         //    for (int i = 0; i < Points.Count; i++)
         //        Console.WriteLine($"(i = {i} :\t{Points[i].X},\t{Points[i].Y},\t{Points[i].Z})");
+        //}
+
+        //public void ConsolePrintNeighbors()
+        //{
+        //    Console.WriteLine($"Radius is {Radius}\n\n");
+        //    for (int i = 0; i < Points.Count; i++)
+        //        Console.WriteLine($"For {i} is {Points[i].NeighborIndex.Count} : {string.Join(" ", Points[i].NeighborIndex)}");
         //}
     }
 }
