@@ -8,17 +8,17 @@ namespace NeighborSearch
 {
     internal static class NeighborFinder
     {
-        private static void CalcParallelCell()
+        public static void ParallelCell(List<Point> points)
         {
 
         }
 
-        private static void CalcSequentialCell()
+        public static void SequentialCell(List<Point> points)
         {
 
         }
 
-        private static void CalcSequentialSearch()
+        public static void SequentialSearch(List<Point> points)
         {
 
         }
