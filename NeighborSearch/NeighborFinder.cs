@@ -15,7 +15,15 @@ namespace NeighborSearch
 
         public static void SequentialCell(List<Point> points, float radius)
         {
+            int numberOfCells = (int)Math.Ceiling(300 / radius);
+            List<Point>[,,] cells = new List<Point>[numberOfCells, numberOfCells, numberOfCells];
 
+            for (int i = 0; i < points.Count; i++)
+            {
+                cells[(int)(points[i].X / radius),
+                      (int)(points[i].Y / radius),
+                      (int)(points[i].Z / radius)].Add(points[i]);
+            }
         }
 
         public static void SequentialSearch(List<Point> points, float radius)
