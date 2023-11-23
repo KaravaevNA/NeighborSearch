@@ -11,13 +11,16 @@ namespace NeighborSearch
 {
     public struct Point
     {
+        public int Index { get; set; }
         public float X { get; set; }
         public float Y { get; set; }
         public float Z { get; set; }
         public List<int> NeighborIndex { get; }
 
-        public Point(float x, float y, float z)
+        public Point(int index, float x, float y, float z)
         {
+            Index = index;
+
             X = x;
             Y = y;
             Z = z;
@@ -47,13 +50,14 @@ namespace NeighborSearch
                     string? line;
                     while ((line = reader.ReadLine()) != null)
                     {
-                        Match match = Regex.Match(line, @"\(i = \d+ :\s*([\d.]+),\s*([\d.]+),\s*([\d.]+)\)"); //три координаты
+                        Match match = Regex.Match(line, @"\(i = (\d+) :\s*([\d.]+),\s*([\d.]+),\s*([\d.]+)\)"); //три координаты
 
                         if (match.Success)
                         {
-                            Points.Add(new Point(float.Parse(match.Groups[1].Value, CultureInfo.InvariantCulture),
+                            Points.Add(new Point(int.Parse(match.Groups[1].Value, CultureInfo.InvariantCulture),
                                                  float.Parse(match.Groups[2].Value, CultureInfo.InvariantCulture),
-                                                 float.Parse(match.Groups[3].Value, CultureInfo.InvariantCulture)));
+                                                 float.Parse(match.Groups[3].Value, CultureInfo.InvariantCulture),
+                                                 float.Parse(match.Groups[4].Value, CultureInfo.InvariantCulture)));
                         }
                     }
                 }
@@ -64,7 +68,7 @@ namespace NeighborSearch
             }
         }
 
-        private void WriteNeighbors(string fileName)
+        public void WriteNeighborsInFile(string fileName = "result.txt")
         {
             using (StreamWriter writer = new StreamWriter(fileName))
             {
@@ -104,20 +108,24 @@ namespace NeighborSearch
             }
 
             Console.WriteLine($"Затрачено времени: {sw.ElapsedMilliseconds}");
-            WriteNeighbors("result.txt");
         }
 
-        //public void ConsolePrintPoints()
-        //{
-        //    for (int i = 0; i < Points.Count; i++)
-        //        Console.WriteLine($"(i = {i} :\t{Points[i].X},\t{Points[i].Y},\t{Points[i].Z})");
-        //}
 
-        //public void ConsolePrintNeighbors()
-        //{
-        //    Console.WriteLine($"Radius is {Radius}\n\n");
-        //    for (int i = 0; i < Points.Count; i++)
-        //        Console.WriteLine($"For {i} is {Points[i].NeighborIndex.Count} : {string.Join(" ", Points[i].NeighborIndex)}");
-        //}
+
+
+
+
+        public void ConsolePrintPoints()
+        {
+            for (int i = 0; i < Points.Count; i++)
+                Console.WriteLine($"(i = {i} :\t{Points[i].X},\t{Points[i].Y},\t{Points[i].Z})");
+        }
+
+        public void ConsolePrintNeighbors()
+        {
+            Console.WriteLine($"Radius is {Radius}\n\n");
+            for (int i = 0; i < Points.Count; i++)
+                Console.WriteLine($"For {i} is {Points[i].NeighborIndex.Count} : {string.Join(" ", Points[i].NeighborIndex)}");
+        }
     }
 }
