@@ -11,8 +11,6 @@ namespace NeighborSearch
             set.WriteNeighborsInFile();
             set.ConsolePrintNeighbors();
             //set.ConsolePrintPoints();
-
-            
         }
     }
 }

@@ -33,24 +33,25 @@ namespace NeighborSearch
     {
         private List<Point> Points { get; }
         private float Radius { get; set; }
+        private Task ReadingPoints { get; set; }
 
         public PointSet(string readFileName)
         {
             Points = new List<Point>();
-            ReadPoints(readFileName);
+            ReadingPoints = ReadPointsAsync(readFileName);
         }
-        public PointSet() : this("points.txt") { }
+        public PointSet() : this("Nat_3kk.txt") { }
 
-        private void ReadPoints(string fileName)
+        private async Task ReadPointsAsync(string fileName)
         {
             try
             {
                 using (StreamReader reader = new StreamReader(fileName))
                 {
                     string? line;
-                    while ((line = reader.ReadLine()) != null)
+                    while ((line = await reader.ReadLineAsync()) != null)
                     {
-                        Match match = Regex.Match(line, @"\(i = (\d+) :\s*([\d.]+),\s*([\d.]+),\s*([\d.]+)\)"); //три координаты
+                        Match match = Regex.Match(line, @"\(i = (\d+) :\s*([\d.]+)\s*,\s*([\d.]+)\s*,\s*([\d.]+)\)"); //три координаты
 
                         if (match.Success)
                         {
@@ -73,8 +74,7 @@ namespace NeighborSearch
             using (StreamWriter writer = new StreamWriter(fileName))
             {
                 writer.WriteLine($"Radius is {Radius}\n\n");
-                for (int i = 0; i < Points.Count; i++)
-                    writer.WriteLine($"For {i} is {Points[i].NeighborIndex.Count} : {string.Join(" ", Points[i].NeighborIndex)}");
+                Points.ForEach(point => writer.WriteLine($"For {point.Index} is {point.NeighborIndex.Count} : {string.Join(" ", point.NeighborIndex)}"));
             }
         }
 
@@ -85,21 +85,23 @@ namespace NeighborSearch
             string? userInput = Console.ReadLine();
             var sw = new Stopwatch();
 
+            ReadingPoints.Wait();
+
             switch (userInput)
             {
                 case "1":
                     sw.Start();
-                    NeighborFinder.SequentialSearch(Points, Radius);
+                    NeighborFinder.NaiveSearch(Points, Radius);
                     sw.Stop();
                     break;
                 case "2":
                     sw.Start();
-                    NeighborFinder.SequentialCell(Points, Radius);
+                    NeighborFinder.CellSearch(Points, Radius, isParallel: false);
                     sw.Stop();
                     break;
                 case "3":
                     sw.Start();
-                    NeighborFinder.ParallelCell(Points, Radius);
+                    NeighborFinder.CellSearch(Points, Radius, isParallel: true);
                     sw.Stop();
                     break;
                 default:
@@ -107,25 +109,18 @@ namespace NeighborSearch
                     return;
             }
 
-            Console.WriteLine($"Затрачено времени: {sw.ElapsedMilliseconds}");
+            Console.WriteLine($"Затрачено времени: {sw.ElapsedMilliseconds} мс");
         }
-
-
-
-
-
 
         public void ConsolePrintPoints()
         {
-            for (int i = 0; i < Points.Count; i++)
-                Console.WriteLine($"(i = {i} :\t{Points[i].X},\t{Points[i].Y},\t{Points[i].Z})");
+            Points.ForEach(point => Console.WriteLine($"(i = {point.Index} :\t{point.X},\t{point.Y},\t{point.Z})"));
         }
 
         public void ConsolePrintNeighbors()
         {
             Console.WriteLine($"Radius is {Radius}\n\n");
-            for (int i = 0; i < Points.Count; i++)
-                Console.WriteLine($"For {i} is {Points[i].NeighborIndex.Count} : {string.Join(" ", Points[i].NeighborIndex)}");
+            Points.ForEach(point => Console.WriteLine($"For {point.Index} is {point.NeighborIndex.Count} : {string.Join(" ", point.NeighborIndex)}"));
         }
     }
 }
