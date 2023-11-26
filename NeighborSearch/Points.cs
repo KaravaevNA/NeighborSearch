@@ -61,7 +61,7 @@ namespace NeighborSearch
 
             bool inputError = false;
             do {
-                string userInput = Console.ReadLine()?.ToUpper() ?? string.Empty;
+                string? userInput = Console.ReadLine();
                 switch (userInput)
                 {
                     case "1":
