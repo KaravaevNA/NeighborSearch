@@ -20,9 +20,8 @@ namespace NeighborSearch
                     for (int zi = 0; zi < numberOfCells; zi++)
                         cells[xi, yi, zi] = new List<Point>();
 
-            for (int i = 0; i < points.Count; i++)
+            foreach (Point point in points)
             {
-                Point point = points[i];
                 int cellXi = (int)(point.X / radius);
                 int cellYi = (int)(point.Y / radius);
                 int cellZi = (int)(point.Z / radius);
@@ -43,6 +42,7 @@ namespace NeighborSearch
                     for (int cellXj = Math.Max(cellXi - 1, 0); cellXj <= Math.Min(cellXi + 1, numberOfCells - 1); cellXj++)
                         for (int cellYj = Math.Max(cellYi - 1, 0); cellYj <= Math.Min(cellYi + 1, numberOfCells - 1); cellYj++)
                             for (int cellZj = Math.Max(cellZi - 1, 0); cellZj <= Math.Min(cellZi + 1, numberOfCells - 1); cellZj++)
+
                                 foreach (Point pointJ in cells[cellXj, cellYj, cellZj])
                                 {
                                     if (pointI.Index == pointJ.Index)
@@ -89,8 +89,8 @@ namespace NeighborSearch
                                   Math.Pow(points[i].Y - points[j].Y, 2) +
                                   Math.Pow(points[i].Z - points[j].Z, 2)) <= radius)
                     {
-                        points[i].NeighborIndex.Add(j);
-                        points[j].NeighborIndex.Add(i);
+                        points[i].NeighborIndex.Add(points[j].Index);
+                        points[j].NeighborIndex.Add(points[i].Index);
                     }
         }
     }
