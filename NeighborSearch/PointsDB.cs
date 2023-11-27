@@ -2,6 +2,7 @@
 using NeighborSearch;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -29,6 +30,7 @@ namespace NeighborSearch
     {
         private async Task ReadPointsFromDBAsync(string dbName)
         {
+            
             using PointSetContext context = new PointSetContext(dbName);
             Points.AddRange(await context.Points.ToListAsync());
         }
@@ -36,21 +38,25 @@ namespace NeighborSearch
         public void SavePointsToDB(string dbName = "points.db")
         {
             ReadingPoints.Wait();
+            Notify?.Invoke($"Запись точек в БД {dbName}");
 
             using PointSetContext context = new PointSetContext(dbName);
 
-            List<int>? pointIndexes = Points.Select(p => p.Index).ToList();
-            List<Point>? pointsToRemove = context.Points.Where(p => !pointIndexes.Contains(p.Index)).ToList();
-            context.Points.RemoveRange(pointsToRemove);
-
-            foreach (var point in Points)
+            if (context.Points.Count() != Points.Count)
             {
-                Point? existingPoint = context.Points.Find(point.Index);
-
-                if (existingPoint == null)
-                    context.Points.Add(point);
-                else if (!existingPoint.Equals(point))
-                    context.Entry(existingPoint).CurrentValues.SetValues(point);
+                context.Database.ExecuteSqlRaw("DELETE FROM Points");
+                context.AddRange(Points);
+            }
+            else
+            {
+                List<Point> dbPoints = context.Points.ToList();
+                for (int i = 0; i < dbPoints.Count; i++)
+                    if (!dbPoints[i].Equals(Points[i]))
+                    {
+                        dbPoints[i].X = Points[i].X;
+                        dbPoints[i].Y = Points[i].Y;
+                        dbPoints[i].Z = Points[i].Z;
+                    }
             }
 
             context.SaveChanges();

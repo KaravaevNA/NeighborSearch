@@ -1,5 +1,4 @@
-﻿
-
+﻿using System.Diagnostics;
 using System.Globalization;
 using System.Text.RegularExpressions;
 
@@ -12,7 +11,7 @@ namespace NeighborSearch
             PointSet set;
             Console.WriteLine("По умолчанию радиус соседства 3.7, чтение точек из points.db, вывод соседей точек в result.txt");
             Console.WriteLine("Введите Y для запуска со стандартными параметрами или N для изменения параметров");
-            
+
             bool inputError = false;
             do
             {
@@ -20,6 +19,7 @@ namespace NeighborSearch
                 switch (userInput)
                 {
                     case "Y":
+                        inputError = false;
                         set = new PointSet();
                         set.FindNeighbors();
                         set.SavePointsToDB();
@@ -27,6 +27,7 @@ namespace NeighborSearch
                         break;
 
                     case "N":
+                        inputError = false;
                         float radius = 3.7f;
                         Console.WriteLine("Y для изменения радиуса:");
                         userInput = Console.ReadLine()?.ToUpper() ?? string.Empty;
@@ -59,12 +60,12 @@ namespace NeighborSearch
                         set.SavePointsToDB();
                         set.WriteNeighborsInTxt();
 
-                        Console.WriteLine("Введите Y для вывода точек в консоль:");
+                        Console.WriteLine("Введите Y для вывода точек в консоль. Используйте для тестирования на малых наборах:");
                         userInput = Console.ReadLine()?.ToUpper() ?? string.Empty;
                         if (userInput == "Y")
                             set.ConsolePrintPoints();
 
-                        Console.WriteLine("Введите Y для вывода соседей в консоль:");
+                        Console.WriteLine("Введите Y для вывода соседей в консоль. Используйте для тестирования на малых наборах:");
                         userInput = Console.ReadLine()?.ToUpper() ?? string.Empty;
                         if (userInput == "Y")
                             set.ConsolePrintNeighbors();
