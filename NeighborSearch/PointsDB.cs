@@ -33,6 +33,8 @@ namespace NeighborSearch
             
             using PointSetContext context = new PointSetContext(dbName);
             Points.AddRange(await context.Points.ToListAsync());
+
+            Notify?.Invoke($"Прочитано {Points.Count} точек из файла {dbName}");
         }
 
         public void SavePointsToDB(string dbName = "points.db")

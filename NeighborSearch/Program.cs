@@ -77,6 +77,8 @@ namespace NeighborSearch
                         break;
                 }
             } while (inputError);
+            Console.WriteLine("Работа завершен успешно");
+            Console.ReadLine();
         }
 
         static void Main()

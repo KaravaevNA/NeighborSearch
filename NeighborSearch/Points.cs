@@ -80,7 +80,7 @@ namespace NeighborSearch
         {
             Radius = radius;
             Notify?.Invoke("Не рекомендуется использовать глупый поиск на входных данных большого размера из-за долгой обработки");
-            Notify?.Invoke("Выберите глупый поиск соседей (1), последовательный поиск по ячейкам (2) или параллельный поиск по ячейкам (3):");
+            Notify?.Invoke("Выберите поиск соседей прямым перебором (1), последовательный поиск по ячейкам (2) или параллельный поиск по ячейкам (3):");
             var sw = new Stopwatch();
 
             ReadingPoints.Wait();
@@ -92,21 +92,32 @@ namespace NeighborSearch
                 {
                     case "1":
                         inputError = false;
+                        Notify?.Invoke($"Начато выполнение поиска соседей последовательным методом прямого перебора");
+                        if (Points.Count > 10000)
+                            Notify?.Invoke($"На текущем объеме входных данных ({Points.Count} точек) поиск этим методом может занять крайне продолжительное время");
+
                         sw.Start();
                         NeighborFinder.NaiveSearch(Points, Radius);
                         sw.Stop();
+
                         break;
                     case "2":
                         inputError = false;
+                        Notify?.Invoke("Начато выполнение поиска соседей последовательным методом ячеек");
+
                         sw.Start();
                         NeighborFinder.CellSearch(Points, Radius, isParallel: false);
                         sw.Stop();
+
                         break;
                     case "3":
                         inputError = false;
+                        Notify?.Invoke("Начато выполнение поиска соседей параллельным методом ячеек");
+
                         sw.Start();
                         NeighborFinder.CellSearch(Points, Radius, isParallel: true);
                         sw.Stop();
+
                         break;
                     default:
                         inputError = true;
@@ -121,13 +132,18 @@ namespace NeighborSearch
 
         private async Task ReadPointsFromTxtAsync(string fileName)
         {
-            try
+            if (!File.Exists(fileName))
             {
-                using StreamReader reader = new StreamReader(fileName);
+                Notify?.Invoke($"Файл {fileName} не найден");
+                return;
+            }
+
+            using StreamReader reader = new StreamReader(fileName);
+            {
                 string? line;
                 while ((line = await reader.ReadLineAsync()) != null)
                 {
-                    Match match = Regex.Match(line, @"\(i = (\d+) :\s*([\d.]+)\s*,\s*([\d.]+)\s*,\s*([\d.]+)\)"); //три координаты
+                    Match match = Regex.Match(line, @"\(i = (\d+) :\s*([\d.]+)\s*,\s*([\d.]+)\s*,\s*([\d.]+)\)"); //индекс и три координаты
 
                     if (match.Success)
                     {
@@ -138,10 +154,8 @@ namespace NeighborSearch
                     }
                 }
             }
-            catch (IOException e)
-            {
-                Notify?.Invoke("Ошибка чтения файла: " + e.Message);
-            }
+
+            Notify?.Invoke($"Прочитано {Points.Count} точек из файла {fileName}");
         }
 
         public void WriteNeighborsInTxt(string fileName = "result.txt")
